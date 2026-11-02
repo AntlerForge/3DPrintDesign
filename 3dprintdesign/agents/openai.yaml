@@ -1,0 +1,3 @@
+interface:
+  display_name: "3DPrintDesign"
+  short_description: "Design, operate Fusion, and prepare FDM prints"

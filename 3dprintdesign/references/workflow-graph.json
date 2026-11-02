@@ -1,0 +1,232 @@
+{
+  "schema_version": 1,
+  "version": "1.0.1",
+  "purpose": "Optional readable planning graph; not executable CAD or manufacturing approval.",
+  "atlas": "workflow-atlas.md",
+  "sources": "sources.md",
+  "edge_semantics": {
+    "requires": "The destination needs valid geometry or resolved input from the source.",
+    "prefer_before": "Revisable ordering heuristic, not a mandatory Fusion dependency."
+  },
+  "workflows": [
+    {
+      "id": "plate-bracket", "title": "Plate or solid bracket",
+      "inputs": ["envelope", "thickness", "mounting dimensions", "load direction"],
+      "nodes": [
+        {"id": "layout", "operation": "Constrain section and mounting datums", "check": "Measured versus provisional dimensions identified"},
+        {"id": "solid", "operation": "Extrude main section", "check": "Extent, operation and thickness"},
+        {"id": "holes", "operation": "Create mounting cuts", "check": "Hole centres, target bodies and tool access"},
+        {"id": "verify", "operation": "Measure and inspect load path", "check": "Geometry checked; strength still requires validation"}
+      ],
+      "edges": [["layout", "solid", "requires"], ["solid", "holes", "requires"], ["holes", "verify", "requires"]],
+      "branches": [{"when": "Actually bent sheet", "use": "sheet-metal"}, {"when": "Reinforcement needed", "use": "rib-web"}]
+    },
+    {
+      "id": "wall-channel", "title": "Extruded wall or channel",
+      "inputs": ["path or closed section", "wall side", "thickness", "height"],
+      "nodes": [
+        {"id": "section", "operation": "Define planar wall path or inner/outer section", "check": "Not construction-only geometry"},
+        {"id": "wall", "operation": "Thin Extrude or extrude closed wall section", "check": "Chosen side and joined ends"},
+        {"id": "verify", "operation": "Inspect corners and section", "check": "Thickness and intended closure"}
+      ],
+      "edges": [["section", "wall", "requires"], ["wall", "verify", "requires"]],
+      "branches": [{"when": "Nonplanar route", "use": "path-sweep"}, {"when": "Reinforces a body", "use": "rib-web"}]
+    },
+    {
+      "id": "open-enclosure", "title": "Open enclosure or tray",
+      "inputs": ["controlled outside or inside dimensions", "floor", "wall", "opening"],
+      "nodes": [
+        {"id": "outer", "operation": "Build controlled main volume", "check": "Envelope and cavity requirements explicit"},
+        {"id": "cavity", "operation": "Shell with removed faces or cut explicit cavity", "check": "Floor, wall and useful space"},
+        {"id": "fixtures", "operation": "Add dependent fixtures and openings", "check": "Correct participants and lid clearance"},
+        {"id": "verify", "operation": "Inspect sections at functional heights", "check": "No accidental breakthrough"}
+      ],
+      "edges": [["outer", "cavity", "requires"], ["cavity", "fixtures", "requires"], ["fixtures", "verify", "requires"]],
+      "branches": [{"when": "Tapered walls", "use": "tapered-container"}, {"when": "Insert seats", "use": "boss-insert"}]
+    },
+    {
+      "id": "closed-clamshell", "title": "Closed hollow body split into halves",
+      "inputs": ["outer form", "wall", "parting plane", "mating strategy"],
+      "nodes": [
+        {"id": "outer", "operation": "Build outer body", "check": "Envelope correct"},
+        {"id": "shell", "operation": "Closed Shell selecting body in Browser", "check": "No opening face selected"},
+        {"id": "split", "operation": "Split and organize halves", "check": "No unwanted partitions"},
+        {"id": "mate", "operation": "Add mating and fastening features", "check": "Independent fit allowance and support access"}
+      ],
+      "edges": [["outer", "shell", "requires"], ["outer", "split", "requires"], ["shell", "split", "prefer_before"], ["split", "mate", "requires"]],
+      "branches": [{"when": "Halves need different cavities", "action": "Split first and hollow each half; replace ordering preference deliberately"}]
+    },
+    {
+      "id": "tapered-container", "title": "Tapered container",
+      "inputs": ["fixed datum", "controlled side", "angle or end sizes", "floor and normal wall"],
+      "nodes": [
+        {"id": "datum", "operation": "Resolve controlled end and envelope", "check": "Inside versus outside intent"},
+        {"id": "outer", "operation": "Create main solid", "check": "Functional size"},
+        {"id": "taper", "operation": "Extrusion taper or Draft", "check": "Correct end grows"},
+        {"id": "cavity", "operation": "Shell or explicit cavity", "check": "Normal wall versus horizontal inset"},
+        {"id": "verify", "operation": "Measure sections at required heights", "check": "Useful cavity and floor retained"}
+      ],
+      "edges": [["datum", "outer", "requires"], ["outer", "taper", "requires"], ["outer", "cavity", "requires"], ["taper", "cavity", "prefer_before"], ["taper", "verify", "requires"], ["cavity", "verify", "requires"]],
+      "branches": [{"when": "Sections change shape", "use": "transition-loft"}, {"when": "Inside-controlled or Draft after Shell intended", "action": "Replan taper/cavity order and inspect both wall faces"}]
+    },
+    {
+      "id": "axisymmetric", "title": "Revolved part",
+      "inputs": ["axis", "radial section", "diameters", "axial lengths"],
+      "nodes": [
+        {"id": "section", "operation": "Define section and axis", "check": "Radius versus diameter and no unintended overlap"},
+        {"id": "revolve", "operation": "Revolve", "check": "Bore and outside shape present"},
+        {"id": "detail", "operation": "Add asymmetric features", "check": "Correct ownership and locations"},
+        {"id": "verify", "operation": "Measure functional sections", "check": "Diameters at relevant axial locations"}
+      ],
+      "edges": [["section", "revolve", "requires"], ["revolve", "detail", "requires"], ["detail", "verify", "requires"]],
+      "branches": [{"when": "Threaded cylinder", "use": "threads"}]
+    },
+    {
+      "id": "path-sweep", "title": "Swept path part",
+      "inputs": ["path", "section", "start orientation", "guidance intent"],
+      "nodes": [
+        {"id": "path", "operation": "Define route", "check": "Curvature and end directions"},
+        {"id": "section", "operation": "Locate section plane", "check": "Intended relation to path"},
+        {"id": "sweep", "operation": "Sweep with chosen guidance", "check": "No unwanted scaling or twist"},
+        {"id": "verify", "operation": "Inspect bends and sections", "check": "No overlap and continuous wall"}
+      ],
+      "edges": [["path", "section", "prefer_before"], ["path", "sweep", "requires"], ["section", "sweep", "requires"], ["sweep", "verify", "requires"]],
+      "branches": [{"when": "Distinct changing sections control", "use": "transition-loft"}]
+    },
+    {
+      "id": "transition-loft", "title": "Changing-section transition",
+      "inputs": ["section planes", "section correspondence", "guide mode", "continuity"],
+      "nodes": [
+        {"id": "sections", "operation": "Locate ordered profiles", "check": "Seams and connectors"},
+        {"id": "guides", "operation": "Choose no guides, rails or centerline", "check": "Rails intersect every section; centerline differs"},
+        {"id": "loft", "operation": "Loft", "check": "No unintended twist"},
+        {"id": "verify", "operation": "Inspect sections and body type", "check": "Clearance and continuity"}
+      ],
+      "edges": [["sections", "guides", "prefer_before"], ["sections", "loft", "requires"], ["guides", "loft", "requires"], ["loft", "verify", "requires"]],
+      "branches": [{"when": "Solid loft cannot express controlled shape", "use": "surface-body"}]
+    },
+    {
+      "id": "flat-relief", "title": "Planar relief",
+      "inputs": ["authorized profiles", "target face", "size", "depth and effect"],
+      "nodes": [
+        {"id": "target", "operation": "Inspect planar target", "check": "Enough remaining material"},
+        {"id": "profiles", "operation": "Clean and dimension profiles", "check": "Scale, duplicates, islands and closed loops"},
+        {"id": "relief", "operation": "Extrude Join or Cut", "check": "Correct material effect"},
+        {"id": "verify", "operation": "Inspect depth and connection", "check": "No detached regions or breakthrough"}
+      ],
+      "edges": [["target", "relief", "requires"], ["profiles", "relief", "requires"], ["relief", "verify", "requires"]],
+      "branches": [{"when": "Curved target", "use": "curved-relief"}, {"when": "Repeated detail", "use": "feature-pattern"}]
+    },
+    {
+      "id": "curved-relief", "title": "Curved-surface relief",
+      "inputs": ["target surface", "profiles", "placement", "depth semantics"],
+      "nodes": [
+        {"id": "target", "operation": "Inspect faces and seams", "check": "Surface type and thickness"},
+        {"id": "profiles", "operation": "Prepare representative dimensioned profile", "check": "Scale and orientation"},
+        {"id": "emboss", "operation": "Test small Emboss", "check": "Supported wrap and effect"},
+        {"id": "verify", "operation": "Inspect local depth and attachment", "check": "No unintended distortion"}
+      ],
+      "edges": [["target", "emboss", "requires"], ["profiles", "emboss", "requires"], ["emboss", "verify", "requires"]],
+      "branches": [{"when": "Emboss unsuitable", "use": "surface-body"}, {"when": "Fallback is straight extrusion", "action": "Disclose that constant normal depth is not guaranteed"}]
+    },
+    {
+      "id": "feature-pattern", "title": "Repeated features or parts",
+      "inputs": ["seed", "entity type", "count", "spacing or extent", "reference", "termination"],
+      "nodes": [
+        {"id": "seed", "operation": "Prove complete functional seed", "check": "Required root blends included"},
+        {"id": "reference", "operation": "Define distribution", "check": "Span equals count minus one times spacing"},
+        {"id": "pattern", "operation": "Pattern intended entity type", "check": "Compute mode suits terminations"},
+        {"id": "verify", "operation": "Inspect first, middle, last and boundaries", "check": "Count, targets and spacing"}
+      ],
+      "edges": [["seed", "pattern", "requires"], ["reference", "pattern", "requires"], ["pattern", "verify", "requires"]],
+      "branches": [{"when": "Each cut ends on a different face", "action": "Test suitable per-instance recomputation rather than identical copies"}]
+    },
+    {
+      "id": "threads", "title": "Printed or specified threads",
+      "inputs": ["standard and designation", "pitch and hand", "engagement", "process", "fit strategy"],
+      "nodes": [
+        {"id": "spec", "operation": "Resolve actual specification", "check": "No arbitrary first dialog size"},
+        {"id": "cylinder", "operation": "Create bore or shaft", "check": "Correct supporting cylinder and wall"},
+        {"id": "thread", "operation": "Create required thread representation", "check": "Modeled if physical helix needed"},
+        {"id": "verify", "operation": "Inspect engagement and export", "check": "Helix, lead-in and fit coupon requirement"}
+      ],
+      "edges": [["spec", "cylinder", "requires"], ["cylinder", "thread", "requires"], ["spec", "thread", "requires"], ["thread", "verify", "requires"]],
+      "branches": [{"when": "Heat-set insert instead", "use": "boss-insert"}, {"when": "Tapped metal part", "action": "Use appropriate machining preparation/callout rather than require printed helix"}]
+    },
+    {
+      "id": "boss-insert", "title": "Standoffs and insert seats",
+      "inputs": ["mounting datum", "hardware drawing", "height", "floor/lid stack", "tool access"],
+      "nodes": [
+        {"id": "layout", "operation": "Resolve mounting and hardware dimensions", "check": "Actual insert specification"},
+        {"id": "boss", "operation": "Extrude standoff", "check": "Height, diameter and attachment"},
+        {"id": "pocket", "operation": "Cut pocket/hole", "check": "Depth and remaining floor"},
+        {"id": "reinforce", "operation": "Add required root geometry", "check": "Access preserved"},
+        {"id": "verify", "operation": "Inspect section and assembly", "check": "Fit coupon, lid clearance and engagement"}
+      ],
+      "edges": [["layout", "boss", "requires"], ["boss", "pocket", "requires"], ["boss", "reinforce", "requires"], ["pocket", "verify", "requires"], ["reinforce", "verify", "requires"]],
+      "branches": [{"when": "Boss command unavailable", "action": "Use ordinary sketch/extrude/cut and reinforcement"}, {"when": "Repeated mounting", "use": "feature-pattern"}]
+    },
+    {
+      "id": "rib-web", "title": "Ribs, webs and gussets",
+      "inputs": ["parent supports", "sketch plane", "thickness", "load direction and process"],
+      "nodes": [
+        {"id": "supports", "operation": "Inspect parent faces", "check": "Ownership and access"},
+        {"id": "layout", "operation": "Define reinforcement", "check": "Direction relative to plane"},
+        {"id": "rib", "operation": "Rib, Web or explicit gusset extrusion", "check": "Real attachment and root geometry"},
+        {"id": "verify", "operation": "Inspect section", "check": "Thickness and access, not strength certification"}
+      ],
+      "edges": [["supports", "rib", "requires"], ["layout", "rib", "requires"], ["rib", "verify", "requires"]],
+      "branches": [{"when": "Automatic termination unclear", "action": "Use explicit closed gusset profile and extrusion"}]
+    },
+    {
+      "id": "sheet-metal", "title": "Bent sheet metal",
+      "inputs": ["material", "thickness", "bend rule", "formed dimensions", "process"],
+      "nodes": [
+        {"id": "rule", "operation": "Set actual sheet/bend rule", "check": "Manufacturing assumptions"},
+        {"id": "formed", "operation": "Create flanges", "check": "Bend direction and shape"},
+        {"id": "cuts", "operation": "Cut; Unfold/Refold if needed", "check": "Features spanning bends"},
+        {"id": "flat", "operation": "Update Flat Pattern", "check": "Derived from current model"},
+        {"id": "verify", "operation": "Inspect developed output", "check": "Reliefs, allowances, units and export entitlement"}
+      ],
+      "edges": [["rule", "formed", "requires"], ["formed", "cuts", "requires"], ["cuts", "flat", "requires"], ["flat", "verify", "requires"]],
+      "branches": [{"when": "Manufacturing output requested", "action": "Use Flat Pattern, not temporary Unfold"}]
+    },
+    {
+      "id": "surface-body", "title": "Surface-built solid",
+      "inputs": ["controlling curves", "continuity", "closure or thickness", "allowed tolerance"],
+      "nodes": [
+        {"id": "curves", "operation": "Define boundaries", "check": "Real relationships"},
+        {"id": "surfaces", "operation": "Construct, trim and match patches", "check": "Shape and continuity"},
+        {"id": "solid", "operation": "Stitch, Thicken or Boundary Fill", "check": "Correct closure semantics"},
+        {"id": "verify", "operation": "Inspect open edges, body type and sections", "check": "Valid volume and thickness"}
+      ],
+      "edges": [["curves", "surfaces", "requires"], ["surfaces", "solid", "requires"], ["solid", "verify", "requires"]],
+      "branches": [{"when": "Gaps or folded offsets", "action": "Repair boundaries/offset strategy; do not hide gaps with excessive tolerance"}]
+    },
+    {
+      "id": "organic-form", "title": "Sculpted organic shape",
+      "inputs": ["envelope", "symmetry", "reference views", "functional dimensions"],
+      "nodes": [
+        {"id": "coarse", "operation": "Create coarse T-Spline", "check": "Broad shape and symmetry"},
+        {"id": "shape", "operation": "Refine with limited control geometry", "check": "No hidden folds in control frame"},
+        {"id": "convert", "operation": "Finish Form and diagnose conversion", "check": "Surface versus solid known"},
+        {"id": "interfaces", "operation": "Add precise interfaces after closure", "check": "Functional dimensions preserved"},
+        {"id": "verify", "operation": "Measure and inspect", "check": "No unverified relaxation changes"}
+      ],
+      "edges": [["coarse", "shape", "requires"], ["shape", "convert", "requires"], ["convert", "interfaces", "requires"], ["interfaces", "verify", "requires"]],
+      "branches": [{"when": "Conversion yields open skin", "use": "surface-body"}, {"when": "Shape fits simpler solid construction", "action": "Prefer Extrude, Revolve, Sweep or Loft as appropriate"}]
+    },
+    {
+      "id": "mesh-rebuild", "title": "Mesh or scan to editable part",
+      "inputs": ["units", "known dimensions", "mesh condition", "required edit", "output"],
+      "nodes": [
+        {"id": "inspect", "operation": "Inspect and preserve source", "check": "Scale and watertightness"},
+        {"id": "strategy", "operation": "Choose repair/conversion or dimensional rebuild", "check": "Editability and detail tradeoff"},
+        {"id": "geometry", "operation": "Create controlled geometry", "check": "Method and entitlement suitable"},
+        {"id": "verify", "operation": "Compare dimensions and body type", "check": "No claim of recovered original history"}
+      ],
+      "edges": [["inspect", "strategy", "requires"], ["strategy", "geometry", "requires"], ["geometry", "verify", "requires"]],
+      "branches": [{"when": "Only perspective image and one scale length", "action": "Do not infer hidden thickness or claim perspective correction"}]
+    }
+  ]
+}
