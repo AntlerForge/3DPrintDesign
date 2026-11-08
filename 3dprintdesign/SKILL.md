@@ -8,7 +8,7 @@ description: >-
   and evidence-based learning from design work.
 license: "MIT"
 metadata:
-  version: "1.0.1"
+  version: "1.1.0"
 ---
 
 # 3DPrintDesign
@@ -50,6 +50,12 @@ type, history position, current dialog and save state before edits. Recover
 continuity only from user-designated accessible records, not assumed old chats.
 Ask only for missing facts that change the part, fit, load, process or target.
 Keep measurements distinct from provisional design values.
+
+For parts using bearings, screws, nuts or shafts, consult the user's accessible
+hardware and fit-test records before choosing interfaces. Design around confirmed
+stock; packaging quantities and old counts are not today's available balance.
+Keep those records private, outside this skill. Do not require an inventory for
+a simple teaching question or invent one when none is available.
 
 Default to ordinary modelling available with Fusion Personal Use, without paid
 extensions. Its free license is for qualifying home-based, noncommercial work,
@@ -120,5 +126,10 @@ tests. Do not call screenshots or a successful slice production validation.
 For continued work, use the small [session record](references/session-record.md)
 in the user's project, or return it as text if writing is unavailable. Identify
 objects by name, position and dimensions, never colour alone.
+
+At a design handoff, keep the native design and delivered manufacturing files
+together in the user's designated project location when writing is available.
+Verify the actual delivered revision there; record unavailable transfers as
+pending. See [delivery and recovery](references/data-management.md#keep-a-recoverable-delivery).
 
 Official source links and dated evidence limits are in [sources](references/sources.md).

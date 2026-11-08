@@ -31,6 +31,10 @@ The skill itself does not install Fusion, a slicer or computer-control software.
   transitions rather than deletion or project archiving.
 - Editable saves, backups, assemblies, hardware fits, motion and clearance checks.
 - Print orientation, strength, supports, calibrated fit coupons and multi-plate packs.
+- Private hardware/fit records for reusing proven interfaces and planning tests
+  for new sizes, without turning one printer's measurements into global defaults.
+- Recoverable handoffs that keep native designs with their delivered print files
+  in the user's chosen project location.
 - Optional integration/computer-control setup, with permission and real output checks.
 - Explicit `learn` cycles that review evidence and implement scoped improvements
   in a designated editable source while keeping private project history separate.

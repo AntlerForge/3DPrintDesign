@@ -1,6 +1,6 @@
 # 3DPrintDesign
 
-Version 1.0.1. Design and make editable Fusion parts, inspect assemblies, prepare
+Version 1.1.0. Design and make editable Fusion parts, inspect assemblies, prepare
 FDM print packs, or learn the steps yourself. Hands-on Fusion and slicer control
 is supported when your agent has native computer-use tools or an authorized
 structured API/MCP connection. Without those tools it guides you manually.
@@ -72,6 +72,26 @@ Use $3dprintdesign. Learn from this session and these fit-test notes.
 Implement supported improvements in my designated writable skill source,
 check them and update my private project checkpoint. Preserve a rollback.
 ```
+
+## Reuse your hardware and fit results
+
+Point the agent at any private hardware list and previous fit-test notes you
+want it to use. It should work around what you own, preserve tested interfaces
+and keep estimates for new sizes separate from accepted results. It records
+useful feedback with the actual CAD variant and print setup so another session
+can reuse it. Your measurements stay in your own records, outside this package.
+
+```text
+Use $3dprintdesign. Use my hardware list and accepted fit notes for this part.
+Keep the working interfaces. For the new bearing size, prepare labelled
+fit-test variants rather than assuming the old allowance will work.
+Do not start a print.
+```
+
+For a delivered revision, keep the native design and its print files together
+in your chosen project folder, with what was checked and what remains untested.
+The agent must not assume you have a shared server or claim a transfer succeeded
+without checking the files. See the [delivery guidance](references/data-management.md#keep-a-recoverable-delivery).
 
 ## What learn does
 

@@ -70,6 +70,10 @@ build size, ambient range or a calibration profile from another printer.
 - [Bambu Studio](https://bambulab.com/en/download/studio): optional supported slicer route.
 - [Bambu official wiki](https://wiki.bambulab.com/en/): printer, plate, filament and environment guidance.
 - [Prusa Knowledge Base](https://help.prusa3d.com/): another FDM manufacturer's printer/slicer guidance.
+- [Modelling for printing, tolerances](https://help.prusa3d.com/article/modeling-with-3d-printing-in-mind_164135):
+  opened on 2026-11-08. Fit varies with size, orientation, geometry, calibration,
+  settings and material. This supports testing comparable interfaces, not a
+  universal numerical clearance or transferring one printer's calibration.
 
 Use the target manufacturer's documentation for other machines. No universal
 bed temperature, enclosure requirement, fit clearance or strength setting is
@@ -77,7 +81,7 @@ established by these links.
 
 ## Package validation
 
-Version **1.0.1** is a reference-only portable edition. Naming/frontmatter,
+Version **1.1.0** is a reference-only portable edition. Naming/frontmatter,
 local-link, graph and instruction-routing checks are separate from operational
 validation. The saved package may include release-owner test results; only
 checks actually run may be reported as passed. Preparation does not establish
@@ -115,3 +119,29 @@ terms; their licences are not changed by this package.
 
 Version 1.0.1 adds the approved public licence and repository links to the initial
 portable edition. It does not claim new live CAD, integration or physical tests.
+
+### Version 1.1.0, 8 November 2026
+
+Adds private fit-evidence lookup and recording, independent interface allowances,
+provisional extrapolation through labelled coupons, and recoverable delivery
+folders. The blank fit template contains no owner's stock, measured tolerances,
+machine addresses or project images. Designated private records are optional;
+there is no new server, filesystem or integration dependency.
+
+The retained six package tests, Skill Creator validation and privacy/release
+checks cover the distributed files. Release notes identify the checks actually
+run. Author instruction walkthroughs address the new decisions:
+
+| Request or evidence | Expected next action |
+|---|---|
+| Two projects have different accepted journals for the same nominal bore | Preserve each fit with its geometry/setup; do not average or overwrite |
+| A new bearing size with only earlier fit records | Use comparable allowances to bracket coupons; do not claim a tested result |
+| Sleeve fits separately but binds when installed | Check shaft and bearing together; vary OD and bore independently |
+| Nut slides freely but stops before screw alignment | Inspect travel and remaining wall; retain accepted width/thickness |
+| Record a fit without file access | Return the private record as text and say it is unsaved |
+| Delivery folder unavailable after a successful cloud save | Retain accessible native copy, record pending transfer; do not claim full archive |
+| Teach one Extrude action | Give the useful step; no inventory or archive setup ceremony |
+| Asked to publish improvements from private fitting work | Publish only generic methods; keep filled records and project images private |
+
+These are author walkthroughs, not independent blind evaluations or new
+Fusion, slicer, printer, restored-archive or physical-fit tests.

@@ -13,6 +13,10 @@ load position, sliding friction and overturning. A ballast pocket is capacity,
 not installed mass or demonstrated stability.
 
 Ask for actual available hardware specifications and quantities when needed.
+Read the user's accessible stock and fit records first; ask only for gaps that
+change the joint. Keep project requirements separate from available stock.
+Do not count the same installed bearing twice, treat package quantities as a
+current count, or infer a machine thread from a seller's self-tapper marking.
 Keep measured values, manufacturer nominal values and assumptions separate.
 Check shaft diameter/usable length, bearing ID/OD/width, fastener head diameter
 and height, thread length, nut dimensions, engagement and driver access. A screw
@@ -36,8 +40,34 @@ Record CAD dimensions separately from measured prints, with variant ID,
 printer/nozzle, material, orientation, slicer profile and revision. Transfer of
 an accepted fit to changed conditions is an assumption until checked. There
 is no universal FDM bearing interference, insert pocket or thread allowance.
+Use the user's accepted result for the same interface and setup before trying
+a generic recommendation. Preserve different accepted project fits rather than
+averaging them into one correction.
+
+For an untested size, start with an additive allowance from a comparable feature
+class and bracket it with labelled candidates. Treat that as a test plan, not an
+accepted fit. Do not infer a global shrinkage percentage from one measured size.
+Keep journal OD, rod-hole ID, bearing housing ID, nut across-flats, nut-thickness
+space and blind insertion travel independent. State whether an allowance is
+diametral, total across-flats, per side or axial. Check existing slicer hole and
+contour compensation before adding a CAD allowance.
+
+Use representative wall thickness, insertion length, orientation and supports.
+Check a thin sleeve on its shaft and inside its bearing together: fitting the
+outside can tighten the bore. A nut's coupon needs screw alignment and
+anti-rotation checks as well as insertion. Measure the actual nut rather than
+scaling a smaller pocket by nominal thread size.
 If a nut slides freely but stops short of its screw axis, inspect travel/blind
 depth before widening its already accepted pocket.
+Retain enough material beyond a deeper entry. Binding during insertion is a
+different problem and can need debris removal or thickness clearance instead.
+
+When the user reports a result, add it to the designated private shared fit
+record, if one exists, and link the project's exact variant. Otherwise keep
+the result in the private project note; establish a reusable record only when
+useful and within the available write scope. See the [fit-record template](fit-record.md).
+Do not mark every unselected candidate failed. Record unknown settings as
+unknown, and distinguish as-printed from filed, drilled or otherwise finished.
 
 Apply the accepted variant to every affected production instance and verify
 the exported interface. Preserve accepted dimensions during unrelated edits.

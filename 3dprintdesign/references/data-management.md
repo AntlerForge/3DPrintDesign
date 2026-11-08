@@ -51,6 +51,28 @@ or user confirmation. With file tools, record sizes and checksums for important
 archives when practical. A checksum detects a changed file, not a usable restore.
 A saved macro, script, screenshot or export-dialog close is not a saved design.
 
+## Keep a recoverable delivery
+
+When handing over a design or revision for review, use or printing, keep its
+native archive, delivered meshes/slicer projects and a short revision/checks
+note in the user's designated project location when available. Use that user's
+existing storage; do not assume a shared server, account or network folder.
+Keep prior delivered revisions identifiable and do not overwrite them silently.
+
+Reuse an already checked native export of that exact revision. Otherwise export
+it through an available supported route. Verify the files at the destination,
+not just a transfer command's success. With file access, check nonempty sizes
+and matching hashes for transferred files. A hash proves byte identity, not
+that the native archive restores successfully.
+
+If a destination is unavailable, retain a checked accessible copy and record
+the pending transfer. A blocked archive does not erase a successful cloud save;
+a local archive does not establish cloud completion. Do not claim the handoff
+is fully archived until the requested native and print files are verified there.
+With no write tools, give the user the exact save/export steps and label them
+unperformed. Do not create external sharing or upload private designs as a
+side effect of keeping a local project copy.
+
 ## Native archives and export limits
 
 Use F3D for a self-contained native design when available. Distributed designs

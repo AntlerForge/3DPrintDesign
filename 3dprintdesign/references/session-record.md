@@ -14,10 +14,12 @@ Design type, workspace, geometry/history state:
 Measurements with source; provisional assumptions:
 Parameters and chosen feature route(s):
 Accepted interfaces and fit-coupon variant/profile:
+Private shared hardware/fit record, if any; tested versus provisional allowances:
 Hardware requirements, confirmed dimensions/counts, gaps:
 Cloud save: result/version or blocked/unverified:
 Local native archive: location, references, restore test or untested:
 Exports and slicer projects: exact revision, units, checked/unverified:
+Delivered revision folder; native/print files verified there; pending transfers:
 Print-pack manifest: part IDs, quantities, plate mapping, reused parts:
 Checks: geometry, clearance pairs/phases, slicing, physical feedback:
 Unresolved issues and next useful action:

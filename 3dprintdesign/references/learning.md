@@ -39,6 +39,13 @@ is weaker than the original result and must be labelled. Missing evidence stays
 pending; never advance its reviewed boundary past inspected material. First use
 can bootstrap from available evidence without claiming a historical audit.
 
+Consult designated private hardware/fit records when they contain relevant
+results. Generalize the method, such as separating independent fit dimensions,
+not that user's exact compensation values. Keep successful fits with their
+setup and preserve contradictory results from different geometries. Update
+private fit evidence separately from public instructions. A learn cycle does
+not itself authorize redistributing private records, examples or images.
+
 No new supported lesson is a valid no-change result. Do not invent rules, edits
 or a version bump to make a learning cycle appear productive.
 
